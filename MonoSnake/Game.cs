@@ -7,15 +7,18 @@ namespace MonoSnake
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
-    public class Game1 : Game
+    public class Game : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        SnakeHead head;
 
-        public Game1()
+        public Game()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            graphics.PreferredBackBufferWidth = 600;
+            graphics.PreferredBackBufferHeight = 600;
         }
 
         /// <summary>
@@ -24,12 +27,10 @@ namespace MonoSnake
         /// related content.  Calling base.Initialize will enumerate through any components
         /// and initialize them as well.
         /// </summary>
-        protected override void Initialize()
-        {
+        protected override void Initialize() =>
             // TODO: Add your initialization logic here
 
             base.Initialize();
-        }
 
         /// <summary>
         /// LoadContent will be called once per game and is the place to load
@@ -37,9 +38,10 @@ namespace MonoSnake
         /// </summary>
         protected override void LoadContent()
         {
+
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
+            head = new SnakeHead(new Vector2(100, 500), Content.Load<Texture2D>("Piece"), Color.White, new Vector2(1,1));
             // TODO: use this.Content to load your game content here
         }
 
@@ -59,9 +61,12 @@ namespace MonoSnake
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-
+            KeyboardState ks = Keyboard.GetState();
+           head.position.X = head.position.X + 50;
+            head.Update();
             // TODO: Add your update logic here
 
             base.Update(gameTime);
@@ -73,10 +78,12 @@ namespace MonoSnake
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(color: Color.White);
 
             // TODO: Add your drawing code here
-
+            spriteBatch.Begin();
+            head.Draw(spriteBatch);
+            spriteBatch.End();
             base.Draw(gameTime);
         }
     }
