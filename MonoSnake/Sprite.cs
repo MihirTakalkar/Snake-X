@@ -24,7 +24,7 @@ namespace MonoSnake
 
         public virtual void Update()
         {
-
+            
         }
 
         public virtual void Draw(SpriteBatch batch)

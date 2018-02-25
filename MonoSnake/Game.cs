@@ -11,8 +11,8 @@ namespace MonoSnake
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        SnakeHead head;
-
+        SnakePiece head;
+        Food food;
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -41,7 +41,8 @@ namespace MonoSnake
 
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            head = new SnakeHead(new Vector2(100, 500), Content.Load<Texture2D>("Piece"), Color.White, new Vector2(1,1));
+            head = new SnakePiece(new Vector2(100, 500), Content.Load<Texture2D>("savage"), Color.White, new Vector2(1, 1));
+            food = new Food(new Vector2(100, 500), Content.Load<Texture2D>("bitcoin"), Color.White);
             // TODO: use this.Content to load your game content here
         }
 
@@ -65,7 +66,23 @@ namespace MonoSnake
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
             KeyboardState ks = Keyboard.GetState();
-           head.position.X = head.position.X + 50;
+
+            if (ks.IsKeyDown(Keys.Right))
+            {
+                head.direction = Direction.Right;
+            }
+            if (ks.IsKeyDown(Keys.Left))
+            {
+                head.direction = Direction.Left;
+            }
+            if (ks.IsKeyDown(Keys.Up))
+            {
+                head.direction = Direction.Up;
+            }
+            if(ks.IsKeyDown(Keys.Down))
+            {
+                head.direction = Direction.Down;
+            }
             head.Update();
             // TODO: Add your update logic here
 
@@ -83,8 +100,14 @@ namespace MonoSnake
             // TODO: Add your drawing code here
             spriteBatch.Begin();
             head.Draw(spriteBatch);
+            food.Draw(spriteBatch);
             spriteBatch.End();
             base.Draw(gameTime);
         }
+    }
+
+    public enum Direction
+    {
+        Left, Right, Up, Down, Stop
     }
 }
