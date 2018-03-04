@@ -12,7 +12,13 @@ namespace MonoSnake
     {
         public Vector2 position;
         public Texture2D image;
-
+        public Rectangle hitbox
+        {
+            get
+            {
+                return new Rectangle((int)position.X,(int)position.Y, image.Width, image.Height);
+            }
+        }
         public Color tint;
 
         public Sprite(Vector2 Position, Texture2D Image, Color Tint)
@@ -22,7 +28,7 @@ namespace MonoSnake
             tint = Tint;
         }
 
-        public virtual void Update()
+        public virtual void Update(GameTime gameTime)
         {
             
         }

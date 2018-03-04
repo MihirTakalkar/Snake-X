@@ -16,7 +16,7 @@ namespace MonoSnake
 
         }
 
-        public override void Update()
+        public override void Update(GameTime gameTime)
         {
 
         }

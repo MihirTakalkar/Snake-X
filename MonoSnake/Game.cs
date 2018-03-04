@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace MonoSnake
 {
@@ -9,6 +10,7 @@ namespace MonoSnake
     /// </summary>
     public class Game : Microsoft.Xna.Framework.Game
     {
+        Random random = new Random();
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         SnakePiece head;
@@ -41,8 +43,8 @@ namespace MonoSnake
 
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            head = new SnakePiece(new Vector2(100, 500), Content.Load<Texture2D>("savage"), Color.White, new Vector2(1, 1));
-            food = new Food(new Vector2(100, 500), Content.Load<Texture2D>("bitcoin"), Color.White);
+            head = new SnakePiece(new Vector2(100, 500), Content.Load<Texture2D>("bitcoin"), Color.White, new Vector2(1, 1));
+            food = new Food(new Vector2(100, 400), Content.Load<Texture2D>("graphicscard"), Color.White);
             // TODO: use this.Content to load your game content here
         }
 
@@ -83,7 +85,30 @@ namespace MonoSnake
             {
                 head.direction = Direction.Down;
             }
-            head.Update();
+            if (head.position.Y < 0)
+            {
+                Exit();
+            }
+            if (head.position.X < 0)
+            {
+                Exit();
+            }
+
+            if (head.position.Y > 600)
+            {
+                Exit();
+            }
+            if (head.position.X > 600)
+            {
+                Exit();
+            }
+            if (head.hitbox.Intersects(food.hitbox))
+            {
+                
+                food.position.X = random.Next(0,550);
+                food.position.Y = random.Next(0,550);
+            }
+            head.Update(gameTime);
             // TODO: Add your update logic here
 
             base.Update(gameTime);
