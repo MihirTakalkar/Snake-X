@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Generic;
 
 namespace MonoSnake
 {
@@ -14,6 +15,9 @@ namespace MonoSnake
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         SnakePiece head;
+        int f = 0;
+        List<SnakePiece> pieces;
+
         Food food;
         public Game()
         {
@@ -45,6 +49,8 @@ namespace MonoSnake
             spriteBatch = new SpriteBatch(GraphicsDevice);
             head = new SnakePiece(new Vector2(100, 500), Content.Load<Texture2D>("bitcoin"), Color.White, new Vector2(1, 1));
             food = new Food(new Vector2(100, 400), Content.Load<Texture2D>("graphicscard"), Color.White);
+            pieces = new List<SnakePiece>();
+            pieces.Add(head);
             // TODO: use this.Content to load your game content here
         }
 
@@ -69,22 +75,24 @@ namespace MonoSnake
                 Exit();
             KeyboardState ks = Keyboard.GetState();
 
+
             if (ks.IsKeyDown(Keys.Right))
             {
                 head.direction = Direction.Right;
             }
-            if (ks.IsKeyDown(Keys.Left))
+            else if (ks.IsKeyDown(Keys.Left))
             {
                 head.direction = Direction.Left;
             }
-            if (ks.IsKeyDown(Keys.Up))
+            else if (ks.IsKeyDown(Keys.Up))
             {
                 head.direction = Direction.Up;
             }
-            if(ks.IsKeyDown(Keys.Down))
+            else if (ks.IsKeyDown(Keys.Down))
             {
                 head.direction = Direction.Down;
             }
+
             if (head.position.Y < 0)
             {
                 Exit();
@@ -104,9 +112,27 @@ namespace MonoSnake
             }
             if (head.hitbox.Intersects(food.hitbox))
             {
-                
-                food.position.X = random.Next(0,550);
-                food.position.Y = random.Next(0,550);
+                Vector2 offset = new Vector2();
+                if (head.direction == Direction.Up)
+                {
+                    offset = new Vector2(0,30);
+                }
+                if (head.direction == Direction.Down)
+                {
+                    offset = new Vector2(0, 30);
+                }
+                if (head.direction == Direction.Left)
+                {
+                    offset = new Vector2(0, 30);
+                }
+                if (head.direction == Direction.Right)
+                {
+                    offset = new Vector2(0, 30);
+                }
+                pieces.Add(new SnakePiece(pieces[pieces.Count - 1].position + offset, Content.Load<Texture2D>("bitcoin"), Color.White, new Vector2(1, 1)));
+                pieces[pieces.Count].direction = pieces[pieces.Count - 2].direction;
+                food.position.X = random.Next(0, 550);
+                food.position.Y = random.Next(0, 550);
             }
             head.Update(gameTime);
             // TODO: Add your update logic here
@@ -124,6 +150,10 @@ namespace MonoSnake
 
             // TODO: Add your drawing code here
             spriteBatch.Begin();
+            for (f = 0; f < pieces.Count; f++)
+            {
+                pieces[f].Draw(spriteBatch);
+            }
             head.Draw(spriteBatch);
             food.Draw(spriteBatch);
             spriteBatch.End();
