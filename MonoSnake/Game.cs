@@ -75,10 +75,10 @@ namespace MonoSnake
                 Exit();
             KeyboardState ks = Keyboard.GetState();
 
-
             if (ks.IsKeyDown(Keys.Right))
             {
                 head.direction = Direction.Right;
+
             }
             else if (ks.IsKeyDown(Keys.Left))
             {
@@ -115,27 +115,40 @@ namespace MonoSnake
                 Vector2 offset = new Vector2();
                 if (head.direction == Direction.Up)
                 {
-                    offset = new Vector2(0,30);
+                    offset = new Vector2(0, 32);
                 }
                 if (head.direction == Direction.Down)
                 {
-                    offset = new Vector2(0, 30);
+                    offset = new Vector2(0, -32);
                 }
                 if (head.direction == Direction.Left)
                 {
-                    offset = new Vector2(0, 30);
+                    offset = new Vector2(32, 0);
                 }
                 if (head.direction == Direction.Right)
                 {
-                    offset = new Vector2(0, 30);
+                    offset = new Vector2(-32,0);
                 }
                 pieces.Add(new SnakePiece(pieces[pieces.Count - 1].position + offset, Content.Load<Texture2D>("bitcoin"), Color.White, new Vector2(1, 1)));
-                pieces[pieces.Count].direction = pieces[pieces.Count - 2].direction;
+
+                
+
                 food.position.X = random.Next(0, 550);
                 food.position.Y = random.Next(0, 550);
             }
-            head.Update(gameTime);
-            // TODO: Add your update logic here
+          
+
+            for (int x = 0; x < pieces.Count; x++)
+            {
+                pieces[x].Update(gameTime);
+
+            }
+
+            for (int x = pieces.Count - 2; x >= 0; x--)
+            {
+                pieces[x + 1].direction = pieces[x].direction;
+            }
+
 
             base.Update(gameTime);
         }
