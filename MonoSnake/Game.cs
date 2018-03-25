@@ -17,6 +17,7 @@ namespace MonoSnake
         SnakePiece head;
         int f = 0;
         List<SnakePiece> pieces;
+        TimeSpan timer;
 
         Food food;
         public Game()
@@ -47,7 +48,7 @@ namespace MonoSnake
 
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            head = new SnakePiece(new Vector2(100, 500), Content.Load<Texture2D>("bitcoin"), Color.White, new Vector2(1, 1));
+            head = new SnakePiece(new Vector2(100, 500), Content.Load<Texture2D>("bitcoin"), Color.White, Direction.Stop);
             food = new Food(new Vector2(100, 400), Content.Load<Texture2D>("graphicscard"), Color.White);
             pieces = new List<SnakePiece>();
             pieces.Add(head);
@@ -74,6 +75,8 @@ namespace MonoSnake
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
             KeyboardState ks = Keyboard.GetState();
+
+            timer += gameTime.ElapsedGameTime;
 
             if (ks.IsKeyDown(Keys.Right))
             {
@@ -109,46 +112,46 @@ namespace MonoSnake
             if (head.position.X > 600)
             {
                 Exit();
-            }
+            }            
+
             if (head.hitbox.Intersects(food.hitbox))
             {
-                Vector2 offset = new Vector2();
-                if (head.direction == Direction.Up)
-                {
-                    offset = new Vector2(0, 32);
-                }
-                if (head.direction == Direction.Down)
-                {
-                    offset = new Vector2(0, -32);
-                }
-                if (head.direction == Direction.Left)
-                {
-                    offset = new Vector2(32, 0);
-                }
-                if (head.direction == Direction.Right)
-                {
-                    offset = new Vector2(-32,0);
-                }
-                pieces.Add(new SnakePiece(pieces[pieces.Count - 1].position + offset, Content.Load<Texture2D>("bitcoin"), Color.White, new Vector2(1, 1)));
-
-                
-
                 food.position.X = random.Next(0, 550);
                 food.position.Y = random.Next(0, 550);
-            }
-          
 
-            for (int x = 0; x < pieces.Count; x++)
+                Vector2 offset = new Vector2();
+                if (pieces[pieces.Count - 1].direction == Direction.Up)
+                {
+                    offset = new Vector2(0, 40);
+                }
+                if (pieces[pieces.Count - 1].direction == Direction.Down)
+                {
+                    offset = new Vector2(0, -40);
+                }
+                if (pieces[pieces.Count - 1].direction == Direction.Left)
+                {
+                    offset = new Vector2(40, 0);
+                }
+                if (pieces[pieces.Count - 1].direction == Direction.Right)
+                {
+                    offset = new Vector2(-40, 0);
+                }
+                pieces.Add(new SnakePiece(pieces[pieces.Count - 1].position + offset, Content.Load<Texture2D>("bitcoin"), Color.White, pieces[pieces.Count - 1].direction));                
+            }
+
+            if (timer > TimeSpan.FromMilliseconds(100))
             {
-                pieces[x].Update(gameTime);
+                timer = TimeSpan.Zero;
+                for (int x = 0; x < pieces.Count; x++)
+                {
+                    pieces[x].Update(gameTime);
+                }
 
+                for (int x = pieces.Count - 1; x > 0; x--)
+                {
+                    pieces[x].direction = pieces[x - 1].direction;
+                }
             }
-
-            for (int x = pieces.Count - 2; x >= 0; x--)
-            {
-                pieces[x + 1].direction = pieces[x].direction;
-            }
-
 
             base.Update(gameTime);
         }
