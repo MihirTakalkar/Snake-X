@@ -16,8 +16,12 @@ namespace MonoSnake
         SpriteBatch spriteBatch;
         SnakePiece head;
         int f = 0;
+        bool hit = false;
         List<SnakePiece> pieces;
         TimeSpan timer;
+        int score = 1;
+
+        SpriteFont font;
 
         Food food;
         public Game()
@@ -52,6 +56,9 @@ namespace MonoSnake
             food = new Food(new Vector2(100, 400), Content.Load<Texture2D>("graphicscard"), Color.White);
             pieces = new List<SnakePiece>();
             pieces.Add(head);
+
+            font = Content.Load<SpriteFont>("DefaultFont");
+
             // TODO: use this.Content to load your game content here
         }
 
@@ -74,82 +81,119 @@ namespace MonoSnake
 
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+
             KeyboardState ks = Keyboard.GetState();
 
-            timer += gameTime.ElapsedGameTime;
+            if (hit == false)
+            {                
+                timer += gameTime.ElapsedGameTime;
 
-            if (ks.IsKeyDown(Keys.Right))
-            {
-                head.direction = Direction.Right;
-
-            }
-            else if (ks.IsKeyDown(Keys.Left))
-            {
-                head.direction = Direction.Left;
-            }
-            else if (ks.IsKeyDown(Keys.Up))
-            {
-                head.direction = Direction.Up;
-            }
-            else if (ks.IsKeyDown(Keys.Down))
-            {
-                head.direction = Direction.Down;
-            }
-
-            if (head.position.Y < 0)
-            {
-                Exit();
-            }
-            if (head.position.X < 0)
-            {
-                Exit();
-            }
-
-            if (head.position.Y > 600)
-            {
-                Exit();
-            }
-            if (head.position.X > 600)
-            {
-                Exit();
-            }            
-
-            if (head.hitbox.Intersects(food.hitbox))
-            {
-                food.position.X = random.Next(0, 550);
-                food.position.Y = random.Next(0, 550);
-
-                Vector2 offset = new Vector2();
-                if (pieces[pieces.Count - 1].direction == Direction.Up)
+                if (ks.IsKeyDown(Keys.Right))
                 {
-                    offset = new Vector2(0, 40);
-                }
-                if (pieces[pieces.Count - 1].direction == Direction.Down)
-                {
-                    offset = new Vector2(0, -40);
-                }
-                if (pieces[pieces.Count - 1].direction == Direction.Left)
-                {
-                    offset = new Vector2(40, 0);
-                }
-                if (pieces[pieces.Count - 1].direction == Direction.Right)
-                {
-                    offset = new Vector2(-40, 0);
-                }
-                pieces.Add(new SnakePiece(pieces[pieces.Count - 1].position + offset, Content.Load<Texture2D>("bitcoin"), Color.White, pieces[pieces.Count - 1].direction));                
-            }
-
-            if (timer > TimeSpan.FromMilliseconds(100))
-            {
-                timer = TimeSpan.Zero;
-                for (int x = 0; x < pieces.Count; x++)
-                {
-                    pieces[x].Update(gameTime);
+                    if (!(head.direction == Direction.Left || head.direction == Direction.Right))
+                    {
+                        head.direction = Direction.Right;
+                    }
                 }
 
-                for (int x = pieces.Count - 1; x > 0; x--)
+
+
+                if (ks.IsKeyDown(Keys.Right) && head.direction != Direction.Left)
                 {
-                    pieces[x].direction = pieces[x - 1].direction;
+                    head.direction = Direction.Right;
+
+                }
+                else if (ks.IsKeyDown(Keys.Left) && head.direction != Direction.Right)
+                {
+                    head.direction = Direction.Left;
+                }
+                else if (ks.IsKeyDown(Keys.Up) && head.direction != Direction.Down)
+                {
+                    head.direction = Direction.Up;
+                }
+                else if (ks.IsKeyDown(Keys.Down) && head.direction != Direction.Up)
+                {
+                    head.direction = Direction.Down;
+                }
+
+                if (head.position.Y < 0)
+                {
+                    hit = true;
+                }
+                if (head.position.X < 0)
+                {
+                    hit = true;
+                }
+
+                if (head.position.Y > GraphicsDevice.Viewport.Height)
+                {
+                    hit = true;
+                }
+                if (head.position.X > GraphicsDevice.Viewport.Width)
+                {
+                    hit = true;
+                }
+
+                if (head.hitbox.Intersects(food.hitbox))
+                {
+                    score += 44;
+                    food.position.X = random.Next(0, 550);
+                    food.position.Y = random.Next(0, 550);
+
+                    Vector2 offset = new Vector2();
+                    if (pieces[pieces.Count - 1].direction == Direction.Up)
+                    {
+                        offset = new Vector2(0, 40);
+                    }
+                    if (pieces[pieces.Count - 1].direction == Direction.Down)
+                    {
+                        offset = new Vector2(0, -40);
+                    }
+                    if (pieces[pieces.Count - 1].direction == Direction.Left)
+                    {
+                        offset = new Vector2(40, 0);
+                    }
+                    if (pieces[pieces.Count - 1].direction == Direction.Right)
+                    {
+                        offset = new Vector2(-40, 0);
+                    }
+                    pieces.Add(new SnakePiece(pieces[pieces.Count - 1].position + offset, Content.Load<Texture2D>("bitcoin"), Color.White, pieces[pieces.Count - 1].direction));
+                }
+
+                for (int g = 1; g < pieces.Count; g++)
+                {
+                    if (head.hitbox.Intersects(pieces[g].hitbox))
+                    {
+                        hit = true;
+                    }
+
+
+                }
+                if (timer > TimeSpan.FromMilliseconds(100))
+                {
+                    timer = TimeSpan.Zero;
+                    for (int x = 0; x < pieces.Count; x++)
+                    {
+                        pieces[x].Update(gameTime);
+                    }
+
+                    for (int x = pieces.Count - 1; x > 0; x--)
+                    {
+                        pieces[x].direction = pieces[x - 1].direction;
+                    }
+                }
+            }
+            else
+            {
+                //when they lose
+                if (ks.IsKeyDown(Keys.R))
+                {
+                    head = new SnakePiece(new Vector2(100, 500), Content.Load<Texture2D>("bitcoin"), Color.White, Direction.Stop);
+                    food = new Food(new Vector2(100, 400), Content.Load<Texture2D>("graphicscard"), Color.White);
+                    score = 0;
+                    hit = false;
+                    pieces = new List<SnakePiece>();
+
                 }
             }
 
@@ -170,8 +214,15 @@ namespace MonoSnake
             {
                 pieces[f].Draw(spriteBatch);
             }
+            if(hit == true)
+            {
+                spriteBatch.DrawString(font, "You Lose, Press R to Restart", new Vector2 (100, 0), Color.Black);
+            }
             head.Draw(spriteBatch);
             food.Draw(spriteBatch);
+
+            spriteBatch.DrawString(font, $"Score: {score}", Vector2.Zero, Color.Black);
+
             spriteBatch.End();
             base.Draw(gameTime);
         }
