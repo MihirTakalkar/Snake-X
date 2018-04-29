@@ -105,6 +105,7 @@ namespace MonoSnake
                 {
                     pieces[0].direction = Direction.Right;
 
+
                 }
                 else if (ks.IsKeyDown(Keys.Left) && pieces[0].direction != Direction.Right)
                 {
